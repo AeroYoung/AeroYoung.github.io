@@ -1,0 +1,167 @@
+---
+layout: long-post
+title: jQuery自动分页功能 
+description: javascript实现网页自动分页的插件
+category: Web前端
+tags: [JavaScript, jQuery, jekyll]
+---
+随着博文越来越多，博客的首页也越来越长变得不适合浏览，这样势必需要将博客目录分页。Jekyll自带了分页功能，但是局限性很大；同时我想要实现点击标签云，自动显示/隐藏文章重新对博客首页排版，这在Jekyll自带的功能中不能实现。所以我采用jQuery来实现这一功能，并附带实现标签云排版功能。具体效果可查看<a href="{{site.baseurl}}/index.html">我的博客首页</a>
+
+
+<div class="bs-docs-section">
+<h1  class="art-title">首先是思路</h1>
+不要着急写代码，思路很重要！我设想的运行流程应该是这样：
+1. 读取地址栏参数（index.html?currentPage=1&amp;displayTag=All），分别表示当前页码和当前需要显示标签, tag=all代表显示所有tag
+2. 得到含有displayTag的文章的总数，能分成几页
+3. 从0开始给这些文章（&lt;article&gt;）添加一个自定义属性currentIndex，作为显示的序号
+4. 设置页码导航栏</p><br>
+5. 根据currentPage当前页码和每页显示的数量，计算那些文章显示/隐藏。第3步设置的自定义属性排上用场了！</p>
+<h1  class="art-title">HTML中的工作</h1>
+<p>1. 我想要实现，点击某个标签就只显示含有该标签的文章，别的隐藏。这就需要给文章（&lt;article&gt;）加上class，值为tag-XX。比如文章标签是"jQuery"，那么class="tag-jQuery"。显然tag不能有中文。我用的是jekyll模板语言，可以自动给加上class。当然你也可以用别的方法，总之加上class就行了</p>
+<pre class="prettyprint lang-html">
+&lt;article class="『% for tag in post.tags %} tag-{『tag』} 『% endfor%』"&gt;	 
+这里是文章的标题，摘要信息。（我插入了一些jekyll代码，大括号会被解析，所以看到『换成{就能行了）
+&lt;/article&gt;
+</pre>
+<p>2. 我还需要一个导航栏和标签云。</p>
+<pre class="prettyprint lang-html">
+导航栏
+&lt;nav class="pagination" role="navigation"&gt;
+		&lt;a id="fristpage" class="newer-posts"  href=""&gt;
+				&lt;i class="fa fa-angle-double-left"&gt;&lt;/i&gt;&lt;/a&gt;  
+		&lt;a id="prepage"   class="newer-posts"  href=""&gt;&lt;i class="fa fa-angle-left"&gt;&lt;/i&gt;&lt;/a&gt; 
+		&lt;span id="pagenumber" class="page-number"&gt;第 页/共页&lt;i class="fa caret-up"&gt;&lt;/i&gt;			&lt;/span&gt;	
+		&lt;a id="nextpage" class="older-posts"  href=""&gt;&lt;i class="fa fa-angle-right"&gt;&lt;/i&gt;&lt;/a&gt;  
+		&lt;a id="lastpage" class="older-posts"  href=""&gt;&lt;i class="fa fa-angle-double-right"&gt;&lt;/i&gt;&lt;/a&gt; 
+&lt;/nav&gt;
+
+标签云，同样基于jekyll,加上了地址栏参数l
+&lt;a href='{『site.baseurl』}/index.html?currentPage=1&amp;displayTag=All'>ALL&lt;/a&gt;
+『% for tag in site.tags %』
+		&lt;a href='{『site.baseurl』}/index.html?currentPage=1&amp;displayTag={『tag[0]』}'>{『tag[0]』}&lt;/a&gt;
+『% endfor %』
+</pre>
+<h1  class="art-title">开始写jQuery！</h1>
+首先我们将函数封装在一个对象中。代码注释很详细，不用解释了吧？
+<pre class="prettyprint lang-javascript">
+var Paginate = {
+	postTotal:0,  //某Tag总文章数()
+	displayTag:"All",//要显示的标签
+	paginateNum:3,//每页的文章数量
+	maxPage:1,    //最大页码
+	currentPage:1,//当前页码
+	
+	//根据Tag 为Article设置Index 并输出该Tag下的postTotal maxPage
+	SetIndex:function(tag){
+		if(tag==null){tag="All";}
+		//1——设置当前Tag
+		this.displayTag=tag;
+		//2——设置Index
+		tag="tag-"+tag;
+		var num=0;
+		$("article").each(function(index,element){
+			$(element).attr("originIndex",index.toString());
+			if(tag=="tag-All"){	
+				$(element).attr("currentIndex",index.toString());
+				num++;
+			}
+			else{//判断Article中是否有Tag Class				
+				if($(element).hasClass("indexhtml") && $(element).hasClass(tag)){
+					$(element).attr("currentIndex",num.toString());
+					num++;					
+				}else{
+					$(element).attr("currentIndex","-1");
+				}
+			}
+		});
+		//3——输出参数
+		this.postTotal=num;//文章总数
+		var varmaxPage=num/this.paginateNum;
+		this.maxPage=Math.ceil(varmaxPage);//最大页码		
+		this.result=this.maxPage;
+	},
+	//设置页脚导航栏格式 pageNum当前页数
+	SetNavBar:function(pageNum){
+		//容错
+		if(pageNum==null) pageNum=1;
+		pageNum=Math.ceil(pageNum);
+		if(pageNum>this.maxPage) pageNum=this.maxPage;
+		if(pageNum&lt;1) pageNum=1;
+		//设置当前页码
+		this.currentPage=pageNum;
+		//1——修改页脚导航栏，给链接加上地址栏参数
+		if(pageNum>1){
+			$("#fristpage").show();
+			$("#prepage").show();
+			var prepage=pageNum-1;
+			$("#fristpage").attr('href','/index.html?currentPage=1&amp;displayTag='+this.displayTag);
+			$("#prepage").attr('href','/index.html?currentPage='+prepage.toString()+'&amp;displayTag='+this.displayTag);
+		} else {
+			$("#fristpage").hide();
+			$("#prepage").hide();
+		}
+		if(pageNum&lt;this.maxPage){
+			$("#lastpage").show();
+			$("#nextpage").show();
+			var nextpage=pageNum+1;
+			$("#lastpage").attr('href','/index.html?currentPage='+this.maxPage.toString()+'&amp;displayTag='+this.displayTag);
+			$("#nextpage").attr('href','/index.html?currentPage='+nextpage.toString()+'&amp;displayTag='+this.displayTag);
+		} else {
+			$("#lastpage").hide();
+			$("#nextpage").hide();
+		}
+		$("#pagenumber").html("第 "+pageNum.toString()+" 页/共 "+this.maxPage.toString()+" 页");
+	},
+	//分页 根据当前页码显示或隐藏Article
+	Paging:function(){
+		//1——计算得到Article的显示范围 最小为0
+		var minIndex=(this.currentPage-1)*this.paginateNum;
+		var maxIndex=this.currentPage*this.paginateNum-1;
+		//2——根据currentIndex隐藏或显示Article
+		$("article").each(function(index, element) {
+			var currentIndex=$(element).attr("currentIndex");
+			if(currentIndex>=minIndex &amp;&amp; currentIndex<=maxIndex){ 
+				$(element).show(1000);
+			}else{
+				$(element).hide(1000);
+			}
+		});
+	}
+};
+</pre>
+然后我们需要一个解析地址栏参数的函数。如果没有参数则返回null
+<pre class="prettyprint lang-javascript">
+//作用 得到地址栏参数
+function GetUrlPara(name){  
+	var reg = new RegExp("(^|&amp;)"+ name +"=([^&amp;]*)(&amp;|$)"); //构造一个含有目标参数的正则表达式对象
+	var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+	if (r!=null) return unescape(r[2]); return null; //返回参数值 
+}
+</pre>
+然后我们调用函数，实现功能
+<pre class="prettyprint lang-javascript">
+var currentPage=GetUrlPara("currentPage");
+var displayTag=GetUrlPara("displayTag");
+Paginate.SetIndex(displayTag);
+Paginate.SetNavBar(currentPage);	
+Paginate.Paging();
+</pre>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,104 @@
+---
+layout: post
+title: UG二次开发——数据类型转换
+description: UG/NX二次开发 数据类型转换
+category: UG二次开发
+tags: [UG, Data-Type]
+---
+<p>
+&nbsp; &nbsp; UG二次开发主要使用NXOpen和UGopen（ufun），这并不是标准的C/C++语言他们建立了大量专有的变量类型，数据类型转化就成了制约新手入门的门槛之一
+
+
+<br><h3>简单转换</h3>
+Body&nbsp;&nbsp;&nbsp;NXOject
+<pre class="prettyprint lang-c">
+NXString JI= nxobject1->JournalIdentifier();
+Body *body1(dynamic_cast&lt;Body *&gt;(workPart->Bodies()->FindObject(JI)));
+</pre>
+
+NXObject&nbsp;&nbsp;&nbsp;tag_t	
+<pre class="prettyprint lang-c">
+tag_t grp_tag=*grp_p_tag;// grp_tag=nxobject1->GetTag();
+TaggedObject *grp_tag_object=NXObjectManager::Get(grp_tag);
+Group *group1(dynamic_cast<Group *>(grp_tag_object));
+</pre>
+
+string&nbsp;&nbsp;&nbsp;NXString 
+<pre class="prettyprint lang-c">
+str_str=nxstring->GetLocalText();
+</pre>
+
+const char*&nbsp;&nbsp;&nbsp;NXString	
+<pre class="prettyprint lang-c">
+char_str=nxstring->GetLocalText();//不推荐
+char_str=str_str.c_str();//str_str为string类型
+
+NXString str1(charBHRT,NXString::Locale);
+</pre class="prettyprint lang-c">
+
+char *&nbsp;&nbsp;&nbsp;const char*	
+<pre class="prettyprint lang-c">
+uc1601((char*)char_str,1);
+</pre>
+
+string&nbsp;&nbsp;&nbsp;Number	
+<pre class="prettyprint lang-c">
+str_str=std::to_string((long double)int_count);
+float_x=std::atof(str_str);
+</pre>
+
+_bstr_t&nbsp;&nbsp;&nbsp;string	
+<pre class="prettyprint lang-c">
+bt=str_str.c_str();
+</pre>
+
+<h3>封装的函数</h3>
+string&nbsp;——>&nbsp;LPCWSTR
+<pre class="prettyprint lang-c">
+wchar_t*&nbsp;NXFunction::StringToWchar(string&nbsp;str)
+{
+	size_t&nbsp;size=str.length();
+
+	wchar_t&nbsp;*wchar_path&nbsp;=&nbsp;new&nbsp;wchar_t[size+1];	
+	MultiByteToWideChar(&nbsp;CP_ACP,&nbsp;0,str.c_str(),&nbsp;size,&nbsp;wchar_path
+	&nbsp;&nbsp;&nbsp;&nbsp;,&nbsp;size&nbsp;*&nbsp;sizeof(wchar_t)&nbsp;);
+	wchar_path[size]&nbsp;=&nbsp;0;&nbsp;&nbsp;//&nbsp;确保以&nbsp;'\0'&nbsp;结尾&nbsp;
+
+	return&nbsp;wchar_path;
+}
+</pre>
+
+LPCWSTR&nbsp;——>&nbsp;nxstring
+<pre class="prettyprint lang-c">
+NXString&nbsp;NXFunction::WcharToNXString(wchar_t&nbsp;*wchar)
+{
+	wchar_t&nbsp;*&nbsp;wText&nbsp;=&nbsp;wchar;//std::string&&nbsp;szDst,&nbsp;
+	DWORD&nbsp;dwNum&nbsp;=&nbsp;WideCharToMultiByte(CP_OEMCP,NULL,wText,-1,NULL,0,NULL,FALSE);//&nbsp;WideCharToMultiByte的运用
+	char&nbsp;*psText;&nbsp;&nbsp;&nbsp;//&nbsp;psText为char*的临时数组，作为赋值给std::string的中间变量
+	psText&nbsp;=&nbsp;new&nbsp;char[dwNum];
+	WideCharToMultiByte&nbsp;(CP_OEMCP,NULL,wText,-1,psText,dwNum,NULL,FALSE);//&nbsp;WideCharToMultiByte的再次运用
+	string&nbsp;szDst&nbsp;=&nbsp;psText;//&nbsp;std::string赋值
+	delete&nbsp;[]psText;//&nbsp;psText的清除
+	NXString&nbsp;str1(szDst.c_str(),NXString::Locale);
+
+	return&nbsp;str1;
+}
+</pre>
+
+LPCWSTR&nbsp;——>&nbsp;string
+<pre class="prettyprint lang-c">
+string&nbsp;NXFunction::WcharToString(wchar_t&nbsp;*wchar)
+{
+	wchar_t&nbsp;*&nbsp;wText&nbsp;=&nbsp;wchar;//std::string&&nbsp;szDst,&nbsp;
+	DWORD&nbsp;dwNum&nbsp;=&nbsp;WideCharToMultiByte(CP_OEMCP,NULL,wText,-1,NULL,0,NULL,FALSE);//&nbsp;WideCharToMultiByte的运用
+	char&nbsp;*psText;&nbsp;&nbsp;&nbsp;//&nbsp;psText为char*的临时数组，作为赋值给std::string的中间变量
+	psText&nbsp;=&nbsp;new&nbsp;char[dwNum];
+	WideCharToMultiByte&nbsp;(CP_OEMCP,NULL,wText,-1,psText,dwNum,NULL,FALSE);//&nbsp;WideCharToMultiByte的再次运用
+	string&nbsp;szDst&nbsp;=&nbsp;psText;//&nbsp;std::string赋值
+	delete&nbsp;[]psText;//&nbsp;psText的清除
+
+	return&nbsp;szDst;
+}
+</pre>
+
+</p>

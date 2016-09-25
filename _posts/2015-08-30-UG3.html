@@ -1,0 +1,44 @@
+---
+layout: post
+title: UG二次开发——问题与方法
+description: UG/NX二次开发中常见的问题
+category: UG二次开发
+tags: [UG, Problem]
+---
+<p>
+&nbsp; &nbsp; 以下是我在UG开发和过程中遇到的一些问题及其解决方法
+
+
+<br><h4>1.	uf函数失效</h4>
+没有初始化ufun函数
+
+<h4>2.	调用另一个对话</h4>框
+有一些UF函数在对话框cpp中无效，只能在无对话框的dll中使用。所以在class A中调用dialog class B。具体可见PLM的教程35，需要注意的是，A需要调用B中的值，该值不能初始化！只能在ok_cb或者cancel_cb中赋值。
+<br>
+
+<h4>3.	在别人电脑提示“无法加载图像”</h4>
+方法1<br>
+静态链接 即可解决
+点击"项目"--- "属性"，打开项目属性页，点击 "配置属性"--- "C/C++"--- "代码生成"，将此页面右边的 "运行时库"由默认的 "多线程DLL(/MD)"改为 "多线程(/MT)"或 "多线程调试(/MTD)"即可。   
+不过一般情况下生成release版本的应用程序时选 "多线程(/MT) "即可，因为这样生成的exe程序较小。   
+而如果选了 "多线程调试(/MTD) "，则由于加入了大量的调试信息而使生成的exe程序会增大好几倍<br>
+方法2<br>
+<a href="http://blog.csdn.net/tangxiaoli711/article/details/38961623">在CMD中注册dll</a> 
+<br>
+
+<h4>4.	连接数据库 无法导入dll import失败</h4>
+换成另一个文件：C:/Program Files/Common Files/System/ado/msado15.dll
+<br>
+
+<h4>5.	Win7编译的dll在XP中无法连接数据库</h4>
+换用XP的msado.dll<br>
+
+<h4>6.	无法打开lib文件</h4>
+把找到的文件放到….BOM \BOM目录下 即和cpp, hpp文件同目录<br>
+
+<h4>7.	error C2872:不明确的符号</h4>
+<a href="http://msdn.microsoft.com/zh-cn/library/t57wswcs(v=vs.80).aspx">把命名空间Using放在所有头文件的后面</a><br>
+
+<h4>8.	没有入口函数</h4>
+根据提示，修改入口函数名称。适用于无对话框dll
+</p>

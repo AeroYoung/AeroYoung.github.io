@@ -1,0 +1,45 @@
+---
+layout: gateway
+---
+<!-- article -->
+<article class="post {{post.category}}">	
+										
+		<div class="post-head">
+				<h1 class="post-title"><a href="#">{{page.title}}</a></h1>
+				<div class="post-meta">
+						<date class="post-date">{{page.date |date:"%Y年%m月%d日"}}</date>
+				</div>
+		</div>
+		
+		<div class="post-content">
+				{{content}}
+		</div>
+
+		<footer class="post-footer clearfix">
+				<div class="pull-left tag-list">
+						<i class="fa fa-folder-open-o"></i>
+						{% for t in page.tags %}
+							<a href="#">{{t}}</a>
+						{% endfor %}
+				</div>
+				<div class="pull-right share">
+				</div>
+		</footer>
+		
+</article>      
+<!-- disqus -->
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+		/* * * CONFIGURATION VARIABLES * * */
+		var disqus_shortname = 'aeroyoung';
+		
+		/* * * DON'T EDIT BELOW THIS LINE * * */
+		(function() {
+				var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+				dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+				(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+		})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+			
+		

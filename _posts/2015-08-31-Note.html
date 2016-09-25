@@ -1,0 +1,25 @@
+---
+layout: post
+title: 《Web性能权威指南》读书笔记
+description: 《Web性能权威指》的理解与记忆
+category: 读书笔记
+tags: [Notes, Web-Develop, Web-Performing]
+---
+《Web性能权威指南》读书笔记
+
+
+<br><h3>网络技术概览</h3>
+<h4>1.响应时间对用户的影响</h4>
+<p>&nbsp;&nbsp;延迟超过100ms用户就能感觉到，超过300ms就会觉得不舒服，超过500ms就想干别的事情。想要留住用户，就必须减少响应时间！</p>
+
+<h4>2.延迟比带宽重要（得多）</h4>
+<p>&nbsp;&nbsp;要通过光纤启动一次新的TCP连接纽约到伦敦需要三次握手共计<strong>84ms</strong>，而且这与带宽无关。
+TFO（TCP Fast Open）被用来减少握手时间。<br>
+可以打开CMD用如下命令来测量延迟，发现从服务器到终端的最后一公里产生的延迟可能比横跨地球都多！</p>
+<pre class="prettyprint lang-c">
+C:\Users\Username>tracert google.com
+</pre>
+
+<h4>3.<a href="http://www.speedtest.net/">测试客户端到某个本地服务器的上传和下载速度</a></h4>
+
+<h4>4.跳过了UDP和TLS（传输层安全）</h4>

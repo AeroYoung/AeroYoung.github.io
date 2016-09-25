@@ -1,0 +1,69 @@
+---
+layout: long-post
+title: jQuery自动生成页面内导航 
+description: 遍历HTML标签在生成&lt;ul&gt;&lt;li&gt;导航栏
+category: Web前端
+tags: [JavaScript, jQuery]
+---
+有的博文内容很长阅读很不方便，本文介绍利用jQuery自动生成页面内导航。
+
+
+<div class="bs-docs-section">
+<h1 class="art-title">JavaScript/jQuery代码</h1>
+<pre class="prettyprint lang-js">
+function CreateArticleCategory(){   
+	var fatherulID="#rootul";
+	var fatherLevel=0;
+	var rootID="#rootul"
+	var oneID="#";
+	var twoID="#";
+	
+	$(".art-title").each(function(index, element) {
+		var tagName=$(this).get(0).tagName;	
+		if(tagName.substr(0,1)!="H"){ return true;}
+		if(tagName.substr(1,1)&gt;3){return true;}//只收录前三级标题
+		
+		var hID="h-"+index.toString();
+		$(this).attr("id",hID);	
+		
+		var contentH=$(this).html();
+		var level=parseInt(tagName.substr(1,1));
+		var liid="li"+index.toString();
+		var ulid="ul"+index.toString();
+		var object_a="&lt;a href='#"+hID+"'&gt;"+contentH+"&lt;/a&gt;";
+		var object_li="&lt;li  class='li"+tagName.substr(1,1)+"' id='"+liid+"'&gt;&lt;/li&gt;"
+		var object_ul="&lt;ul  class='nav ul-none' id='"+ulid+"'&gt;&lt;/ul&gt;";
+		//获得父级ul的ID是啥 并更新oneID
+		if(level==1){
+			fatherulID=rootID;
+			oneID="#"+ulid;
+		}else if(level==2){
+			fatherulID=oneID;
+			twoID="#"+ulid;
+		}else if(level==3){
+			fatherulID=twoID;
+		}		
+		//在父级ul下加入li 在li下加入a 和 ul
+		$(fatherulID).append(object_li);
+		$("#"+liid).append(object_a);
+		$("#"+liid).append(object_ul);
+	});
+}
+
+$(document).ready(function(){
+	//生成博文内部目录
+	CreateArticleCategory();
+});//end ready function
+</pre>
+
+<h1 class="art-title">HTML</h1>
+<pre class="prettyprint lang-html">
+在想要生成目录的地方添加一个ul,id="rootul"即可
+&lt;div class="col-md-3" role="complementary"&gt;
+	&lt;nav&gt;
+		&lt;ul id="rootul" class="nav bs-docs-sidenav"&gt;&lt;/ul&gt;
+		&lt;a class="back-to-top" href="#"&gt;返回顶部&lt;/a&gt;
+	&lt;/nav&gt;
+&lt;/div&gt;
+</pre>
+</div>

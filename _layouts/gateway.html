@@ -1,0 +1,50 @@
+---
+layout: root
+---
+<section class="content-wrap">
+	<div class="container">
+		<div class="row">
+		
+			<main class="col-md-8 main-content">  
+			
+				{{content}}         
+
+			</main>
+			
+			<aside class="col-md-4 sidebar">
+			
+				<div class="widget">
+					<h4 class="title">社交</h4>
+					<div class="content community">
+						<p><a title="mail" target="_blank"><i class="fa fa-envelope-o"></i></a> saucadcam@126.com</p>
+						<p><a href="https://github.com/AeroYoung" title="github" target="_blank"><i class="fa fa-github-square"></i> GitHub</a></p>
+						<p><a href="http://blog.csdn.net/aeroyoung" title="CSDN博客" target="_blank"><i class="fa fa-weibo"></i> CSDN</a></p>
+					</div>
+				</div>
+				
+				<div class="widget">
+					<h4 class="title">分类</h4>
+					<div class="content download">
+						{% for category in site.categories %}
+						<p><a href="{{site.baseurl}}/category.html#{{ category | first }}">{{ category | first }}</a>({{ category | last | size }})</p>
+						{% endfor %}
+					</div>
+				</div>
+				
+				<div class="widget">
+					<h4 class="title">标签云</h4>
+					<div class="content tag-cloud">
+						<a href='{{site.baseurl}}/index.html?currentPage=1&displayTag=All'>ALL</a>
+						{% for tag in site.tags %}
+								<a href='{{site.baseurl}}/index.html?currentPage=1&displayTag={{tag[0]}}'>{{tag[0]}}</a>
+						{% endfor %}
+					</div>
+				</div> 				
+										
+			</aside>
+			
+		</div>
+	</div>
+</section> 
+
+

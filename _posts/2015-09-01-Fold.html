@@ -1,0 +1,39 @@
+---
+layout: post
+title: JavaScript点击标题折叠文章内容 
+description: 用nextUntil遍历后续同胞元素，当遇到同级或更高级别的标题时候遍历停止，期间所有元素都被隐藏/显示
+category: Web前端
+tags: [JavaScript, jQuery]
+---
+<p>&nbsp;&nbsp;&nbsp;&nbsp;还是在写长博客的时候想到的需求，在文章中点击&lt;h1&gt;等标签的时候自动折叠该标题下的所有子标题和正文。我想到了利用jQuery来实现，给所有标题写加上一个类“art-title”,再在js文件中添加点击事件。然后用nextUntil遍历后续同胞元素，当遇到同级或更高级别的标题时候遍历停止，期间所有元素都被隐藏/显示。</p>
+
+
+<h4>JavaScript/jQuery代码</h4>
+<pre class="prettyprint lang-js">
+$(".art-title").click(function(){		
+//获得标签级别
+var tagName=$(this).get(0).tagName;
+tagName=tagName.toLowerCase();
+var level=tagName.substr(1,1);
+//遍历子元素 
+var brothers=$(this).nextUntil(tagName);
+brothers.each(function(index, element) {
+	var brotagName=$(this).get(0).tagName;
+	if(brotagName.substr(0,1)=="H"){//alert(brotagName);
+		var brolevel=brotagName.substr(1,1);
+		if(brolevel>=level) {$(this).toggle(1000);}
+		else{return false;}//结束循环	
+	}else{
+		$(this).toggle(1000);	
+	}
+});
+if($(this).children("i").length>0) {
+	$(this).children("i").remove();
+}else{ 
+	$(this).prepend("&lt;i class='fa fa-angle-double-down' style='font-style:normal'&gt;&nbsp;&nbsp;&lt;/i&gt;");
+}
+});
+</pre>
+
+<p>同时要求在HTML文件中，标题下的内容（正文+子标题）都用一对&lt;p&gt;&lt;/p&gt;给包括起来，还得给所有标题写加上一个类“art-title”</p>
+<a href="{{site.baseurl}}/2015/08/29/PaperSkill">效果请看我的另一篇博客</a>

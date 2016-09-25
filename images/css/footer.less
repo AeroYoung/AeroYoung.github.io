@@ -1,0 +1,72 @@
+.main-footer .widget {
+  padding: 0px 30px;
+	margin-bottom: 35px;
+}
+.main-footer {
+  background:@black_l2;
+  padding: 35px 0 0;
+  color: @gray_l1;
+}
+.main-footer .widget .title {
+  color: #ffffff;
+  border-bottom: 1px solid @black_l2;
+	
+	margin-top: 0;
+  padding-bottom: 7px;
+  margin-bottom: 21px;
+  position: relative;
+}
+.main-footer .widget .title:after {
+  content: "";
+  width: 90px;
+  height: 1px;
+  background: @color_theme;
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+}
+.main-footer .widget .tag-cloud a,
+.main-footer .widget .tag-cloud p {
+  border: 1px solid @black_l3;
+	
+  padding: 2px 7px;
+  color: @gray_l1;
+  line-height: 1.5em;
+  display: inline-block;
+  margin: 0 7px 7px 0;
+	cursor:pointer;
+  -webkit-transition: all 0.2s ease;
+       -o-transition: all 0.2s ease;
+          transition: all 0.2s ease;
+}
+.main-footer .widget .tag-cloud a:hover,
+.main-footer .widget .tag-cloud p:hover {
+  border: 1px solid @color_theme;
+	
+	color: #ffffff;
+  background: @color_theme;
+  text-decoration: none;
+	cursor:pointer;
+}
+
+
+#back-to-top {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  background: fade(@color_theme, 60%);  
+  color: #ffffff;
+  text-align: center;
+  border-radius: 2px;
+  z-index: 1;
+  display: none;
+}
+#back-to-top:hover {
+  background: @color_theme;
+}
+#back-to-top i {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+}
+

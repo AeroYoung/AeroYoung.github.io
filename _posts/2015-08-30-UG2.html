@@ -1,0 +1,106 @@
+---
+layout: post
+title: UG二次开发——常用的方法
+description: UG/NX二次开发中常用的方法
+category: UG二次开发
+tags: [UG]
+---
+<p>&nbsp; &nbsp; 这是我在NXOpen和UGOpen开发过程中收集整理的一些方法
+
+
+<br>1.	获取图层编号
+<pre class="prettyprint lang-c">
+Layer::Category *category1(dynamic_cast&lt;Layer::Category*&gt;(workPart->LayerCategories()->FindObject("XX")));
+numbers=category1->GetMemberLayers();
+layer_num_inletbushing=numbers[0];
+</pre>
+
+2.	获取图层内所有对象
+<pre class="prettyprint lang-c">
+std::vector<NXObject *>objects1=workPart->Layers()->GetAllObjectsOnLayer(layer_num_inletbushing); 
+</pre>
+
+3.	移动对象到某一图层
+<pre class="prettyprint lang-c">
+std::vector<DisplayableObject *> objectArray1(1);
+objectArray1[0]=body1;
+workPart->Layers()->MoveDisplayableObjects(40, objectArray1);
+</pre>
+
+4.	隐藏图层
+<pre class="prettyprint lang-c">
+std::vector<Layer::StateInfo> stateArray1(1);
+stateArray1[0] = Layer::StateInfo(42, Layer::StateHidden);
+workPart->Layers()->ChangeStates(stateArray1, false);
+</pre>
+
+5.	隐藏实体
+<pre class="prettyprint lang-c">
+theSession->DisplayManager()->BlankObjects(nxobject1);    
+workPart->ModelingViews()->WorkView()->FitAfterShowOrHide(View::ShowOrHideTypeHideOnly);
+</pre>
+
+6.	获得环境变量
+<pre class="prettyprint lang-c">
+UF_translate_variable("ugbhrt",&amp;charBHRT);
+NXString str1(charBHRT,NXString::Locale);
+</pre>
+
+7.	当前文档路径
+<pre class="prettyprint lang-c">
+Session *theSession = Session::GetSession();
+Part *workPart(theSession->Parts()->Work());
+tag_t part_tag = workPart->GetTag();	
+char *filepath=" ";
+UF_PART_ask_part_name(part_tag,filepath);
+</pre>
+
+8.	获得特征类型
+<pre class="prettyprint lang-c">
+NXString string1= pp->FeatureType();
+</pre>
+
+9.	根据实体名称找到实体	
+<pre class="prettyprint lang-c">
+NXOpen::BodyCollection::iterator it;
+NXOpen::BodyCollection *body_collection=workPart->Bodies();
+for(it=body_collection->begin();it!=body_collection->end();it++)
+{
+	std::vector&lt;NXObject *&gt; objects(1);
+	Body *body(dynamic_cast&lt;Body*&gt;(*it));
+	objects[0]=body;
+	string strname=objects[0]->Name().GetLocaleText();
+	if(strname=="MANIFOLD")       {i_m++;g_manifold     =objects[0]->JournalIdentifier();}
+	if(strname=="SUB_SCREW")      {i_t++;g_subscrew     =objects[0]->JournalIdentifier();}
+}
+</pre>
+
+10.	判断曲线类型
+<pre class="prettyprint lang-c">
+UF_EVAL_p_t eval;
+UF_EVAL_initialize(object->GetTag(),&eval);
+logical is_curve;
+UF_EVAL_is_arc(eval,&is_curve);
+UF_EVAL_free(eval);
+</pre>
+
+11.	获得组名
+<pre class="prettyprint lang-c">
+tag_t arc_tag = cylinder_2d_object->GetTag();
+tag_p_t grp_p_tag;
+int count;
+int i=UF_GROUP_ask_all_owning_groups(arc_tag,&amp;count,&amp;grp_p_tag);
+tag_t grp_tag=*grp_p_tag;
+TaggedObject *grp_tag_object=NXObjectManager::Get(grp_tag);
+NXObject *grp_object=dynamic_cast&lt;NXObject *&gt;(grp_tag_object);
+NXString str_name=grp_object->Name();
+const char *char_name=str_name.GetLocaleText();//
+NXString strname(char_name);
+</pre>
+
+12.	用uf倒角
+<pre class="prettyprint lang-c">
+Manifold::CreateChamfer
+</pre>
+
+</p>
